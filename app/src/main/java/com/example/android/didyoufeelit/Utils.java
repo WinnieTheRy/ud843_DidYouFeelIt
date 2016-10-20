@@ -15,8 +15,14 @@
  */
 package com.example.android.didyoufeelit;
 
+import android.app.Activity;
+import android.content.Context;
+import android.os.AsyncTask;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -35,17 +41,28 @@ import java.nio.charset.Charset;
  * Utility class with methods to help perform the HTTP request and
  * parse the response.
  */
-public final class Utils {
-
-    /** Tag for the log messages */
-    public static final String LOG_TAG = Utils.class.getSimpleName();
+public final class Utils extends AsyncTask<URL, Void, Event> {
 
     /**
-     * Query the USGS dataset and return an {@link Event} object to represent a single earthquake.
+     * Tag for the log messages
      */
-    public static Event fetchEarthquakeData(String requestUrl) {
+    public static final String LOG_TAG = Utils.class.getSimpleName();
+
+    Context context;
+
+
+    public Utils (Context cont) {
+
+        this.context = cont;
+
+    }
+
+
+    @Override
+    protected Event doInBackground(URL... urls) {
+
         // Create URL object
-        URL url = createUrl(requestUrl);
+        URL url = createUrl(MainActivity.getUsgsRequestUrl());
 
         // Perform HTTP request to the URL and receive a JSON response back
         String jsonResponse = null;
@@ -60,7 +77,21 @@ public final class Utils {
 
         // Return the {@link Event}
         return earthquake;
+
     }
+
+    @Override
+    protected void onPostExecute(Event event) {
+
+        if(event == null){
+            return;
+        }
+
+        TextView textView = (TextView) ((Activity)context).findViewById(R.id.)
+
+
+    }
+
 
     /**
      * Returns new URL object from the given string URL.
@@ -90,9 +121,9 @@ public final class Utils {
         InputStream inputStream = null;
         try {
             urlConnection = (HttpURLConnection) url.openConnection();
+            urlConnection.setRequestMethod("GET");
             urlConnection.setReadTimeout(10000 /* milliseconds */);
             urlConnection.setConnectTimeout(15000 /* milliseconds */);
-            urlConnection.setRequestMethod("GET");
             urlConnection.connect();
 
             // If the request was successful (response code 200),
