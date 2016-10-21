@@ -15,6 +15,7 @@
  */
 package com.example.android.didyoufeelit;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.TextView;
@@ -34,11 +35,40 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Perform the HTTP request for earthquake data and process the response.
-        Event earthquake = Utils.fetchEarthquakeData(USGS_REQUEST_URL);
+        /* We are trying to do the network request on the main thread here*/
 
+        // Perform the HTTP request for earthquake data and process the response.
+        //Event earthquake = Utils.fetchEarthquakeData(USGS_REQUEST_URL);
         // Update the information displayed to the user.
-        updateUi(earthquake);
+        //updateUi(earthquake);
+
+        new BackgroundNetworkConnection().execute(USGS_REQUEST_URL);
+        //same thing as:
+        /*BackgroundNetworkConnection networkConnection = new BackgroundNetworkConnection();
+        networkConnection.execute(); */
+
+    }
+
+    //AsyncTask<Params,Progress, Result> these inputs are called generics
+    private class BackgroundNetworkConnection extends AsyncTask<String, Void, Event> {
+
+
+        @Override
+        protected Event doInBackground(String... params) {
+
+            Event earthquake = Utils.fetchEarthquakeData(params[0]); //or Utils.fetchEarthquakeData(USGS_REQUEST_URL)
+
+
+            return earthquake;
+        }
+
+        @Override
+        protected void onPostExecute(Event event) {
+            //super.onPostExecute(event);
+
+            updateUi(event);
+
+        }
     }
 
     /**
